@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Seguimiento diario CRR | Félix Bulnes</title>
+    <link rel="stylesheet" href="./seguimiento.css" />
+  </head>
+  <body>
+    <main class="daily-shell">
+      <header class="hero">
+        <div class="brand-card">
+          <img src="./assets/felix-bulnes-logo.png" alt="Hospital Clínico Félix Bulnes" />
+          <div>
+            <span>Hospital Clínico Félix Bulnes</span>
+            <strong>Seguimiento diario CRR</strong>
+          </div>
+        </div>
+        <nav class="top-links" aria-label="Navegación">
+          <a href="./dashboard.html">Dashboard</a>
+          <a href="./index.html">Tablero principal</a>
+        </nav>
+        <div class="hero-copy">
+          <p>Control operativo de pabellones</p>
+          <h1>Lectura diaria para anticipar atrasos, suspensiones y carga quirúrgica</h1>
+        </div>
+        <div class="hero-actions">
+          <label>
+            Día
+            <select id="dayFilter"></select>
+          </label>
+          <label>
+            Pabellón
+            <select id="roomFilter"></select>
+          </label>
+          <label>
+            Estado
+            <select id="statusFilter"></select>
+          </label>
+          <button id="reloadExcel" type="button">Actualizar Excel</button>
+        </div>
+      </header>
+
+      <section class="status-strip">
+        <article class="status-tile primary">
+          <span>Programados</span>
+          <strong id="totalCases">0</strong>
+          <small>Casos registrados en la fecha</small>
+        </article>
+        <article class="status-tile success">
+          <span>Realizados / atendidos</span>
+          <strong id="doneCases">0</strong>
+          <small>Actividad resuelta</small>
+        </article>
+        <article class="status-tile warning">
+          <span>Atraso ingreso</span>
+          <strong id="lateCases">0</strong>
+          <small>Ingreso posterior a 08:15</small>
+        </article>
+        <article class="status-tile danger">
+          <span>Suspensiones</span>
+          <strong id="suspendedCases">0</strong>
+          <small id="suspendedDetail">0% del día</small>
+        </article>
+      </section>
+
+      <section class="daily-grid">
+        <article class="panel daily-priority">
+          <div class="panel-title">
+            <p>Lectura jefatura</p>
+            <h2>Prioridad del día</h2>
+          </div>
+          <div class="priority-box" id="priorityBox">
+            <span class="priority-dot"></span>
+            <div>
+              <strong id="priorityTitle">Cargando Excel</strong>
+              <small id="priorityText">Se actualizará con los datos de la plantilla.</small>
+            </div>
+          </div>
+          <div class="action-list" id="actionList"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-title">
+            <p>Distribución</p>
+            <h2>Categoría quirúrgica</h2>
+          </div>
+          <canvas id="categoryChart" width="360" height="280"></canvas>
+          <div class="legend" id="categoryLegend"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-title">
+            <p>Especialidad</p>
+            <h2>Carga por servicio</h2>
+          </div>
+          <canvas id="specialtyChart" width="360" height="280"></canvas>
+          <div class="legend" id="specialtyLegend"></div>
+        </article>
+
+        <article class="panel wide">
+          <div class="panel-title">
+            <p>Pabellones</p>
+            <h2>Seguimiento por sala</h2>
+          </div>
+          <div class="room-board" id="roomBoard"></div>
+        </article>
+
+        <article class="panel wide">
+          <div class="panel-title">
+            <p>Detalle</p>
+            <h2>Lista diaria desde Excel</h2>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Paciente</th>
+                  <th>Pabellón</th>
+                  <th>Estado</th>
+                  <th>Ingreso</th>
+                  <th>Clasificación</th>
+                  <th>Categoría</th>
+                  <th>Especialidad</th>
+                  <th>Cirugía</th>
+                  <th>Causa suspensión</th>
+                </tr>
+              </thead>
+              <tbody id="dailyRows"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="./seguimiento.js"></script>
+  </body>
+</html>
