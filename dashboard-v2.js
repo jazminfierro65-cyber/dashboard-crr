@@ -1,7 +1,4 @@
-const EXCEL_URLS = [
-  "./plantilla_carga_web_crr.xlsx",
-  "./outputs/crr_dashboard/plantilla_carga_web_crr.xlsx",
-];
+const EXCEL_URL = "./outputs/crr_dashboard/plantilla_carga_web_crr.xlsx";
 const palette = ["#16639f", "#e8743b", "#177e55", "#7c3aed", "#0f766e", "#b91c1c", "#64748b"];
 
 let records = [];
@@ -262,17 +259,7 @@ async function loadExcel() {
     return;
   }
   filters.reload.textContent = "Actualizando...";
-  let response;
-  for (const url of EXCEL_URLS) {
-    const candidate = await fetch(`${url}?t=${Date.now()}`).catch(() => null);
-    if (candidate?.ok) {
-      response = candidate;
-      break;
-    }
-  }
-  if (!response) {
-    throw new Error("No se encontro el Excel. Sube plantilla_carga_web_crr.xlsx junto a dashboard.html o en outputs/crr_dashboard/.");
-  }
+  const response = await fetch(`${EXCEL_URL}?t=${Date.now()}`);
   const workbook = XLSX.read(await response.arrayBuffer(), { type: "array", cellDates: true });
   const sheet = workbook.Sheets["Carga Web Cirugias"] || workbook.Sheets[workbook.SheetNames[0]];
   const referenceSheet = workbook.Sheets["Referencias KPI"];
@@ -497,7 +484,6 @@ function renderKpiSet(prefix, data, done, late, suspended, accurate, turnoverVal
         ? `Semana del ${weekRangeLabel(filters.week.value)}`
         : `Mes ${formatMonth(filters.month.value)}`;
   setText(`${id("Total")}Text`, periodText);
-  setText(`${id("Total")}Done`, done.length);
   setText(id("Done"), data.length ? percent(done.length / data.length) : "0%");
   setText(`${id("Done")}Text`, `${done.length} realizados / atendidos`);
   setText(id("Late"), data.length ? percent(late.length / data.length) : "0%");

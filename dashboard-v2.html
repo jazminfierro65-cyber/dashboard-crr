@@ -3,42 +3,43 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Dashboard producción pabellones quirúrgicos CRR</title>
-    <link rel="stylesheet" href="./dashboard.css?v=20260612-github-excel-1" />
+    <title>Propuesta dashboard CRR - Hospital Felix Bulnes</title>
+    <link rel="stylesheet" href="./dashboard-v2.css?v=20260612-fondo-pabellon-suave-1" />
   </head>
   <body>
     <a class="skip-link" href="#contenidoDashboard">Saltar al dashboard</a>
-    <main class="dash-shell">
-      <header class="dash-hero">
-        <div class="brand">
-          <img src="./assets/felix-bulnes-logo.png" alt="Hospital Clínico Félix Bulnes" />
+    <main class="v2-shell">
+      <header class="v2-hero">
+        <div class="v2-brand">
+          <img src="./assets/felix-bulnes-logo.png" alt="Hospital Clinico Felix Bulnes" />
           <div>
-            <span>Hospital Clínico Félix Bulnes</span>
-            <strong>Gestión CRR</strong>
+            <span>Hospital Clinico Felix Bulnes</span>
+            <strong>Gestion CRR</strong>
           </div>
         </div>
-        <div class="hero-title">
-          <p>Seguimiento diario de pabellones</p>
-          <h1>Gestión quirúrgica CRR</h1>
+        <div class="v2-title">
+          <b>Seguimiento diario de pabellones</b>
+          <h1>Gestion quirurgica CRR</h1>
+          <p>Vista diaria, semanal y mensual para seguimiento operativo, enfermeria y direccion.</p>
         </div>
-        <div class="filters" aria-label="Filtros del dashboard">
+        <section class="filters" aria-label="Filtros del dashboard">
           <label>Mes <select id="monthFilter"></select></label>
           <label>Semana <select id="weekFilter"></select></label>
-          <label>Día <select id="dateFilter"></select></label>
+          <label>Dia <select id="dateFilter"></select></label>
           <label>Especialidad <select id="specialtyFilter"></select></label>
           <label>Subespecialidad <select id="subspecialtyFilter"></select></label>
-          <label>Pabellón <select id="roomFilter"></select></label>
+          <label>Pabellon <select id="roomFilter"></select></label>
           <div class="filter-actions">
             <button id="reloadExcel" type="button">Actualizar Excel</button>
             <button id="clearFilters" type="button" class="secondary">Limpiar filtros</button>
           </div>
-        </div>
+        </section>
       </header>
 
-      <nav class="quick-nav" aria-label="Navegación del sistema">
-        <a href="./index.html">Tablero principal</a>
+      <nav class="quick-nav" aria-label="Navegacion del sistema">
+        <a href="./dashboard.html">Dashboard actual</a>
         <a href="./seguimiento.html">Seguimiento diario</a>
-        <a href="./dashboard.html" class="active">Dashboard</a>
+        <a href="./index.html">Tablero principal</a>
       </nav>
 
       <nav class="dashboard-tabs" aria-label="Páginas del informe">
@@ -50,32 +51,32 @@
         <button type="button" data-tab-target="detalle"><b>05</b><span>Detalle</span></button>
       </nav>
 
-      <section class="summary-strip" aria-label="Resumen para jefaturas" data-tab-panel="resumen">
+      <section class="summary-strip" aria-label="Resumen activo" data-tab-panel="resumen">
         <article>
           <span>Fecha visualizada</span>
-          <strong id="summaryDate">Todos los días</strong>
+          <strong id="summaryDate">Todos los dias</strong>
         </article>
         <article>
-          <span>Última actualización</span>
+          <span>Ultima actualizacion</span>
           <strong id="lastUpdated">Pendiente</strong>
         </article>
         <article>
-          <span>Prioridad del día</span>
+          <span>Prioridad operativa</span>
           <strong id="mainPriority">Cargando datos</strong>
         </article>
       </section>
 
-      <section class="panel wide benchmark-panel" aria-label="Referencia versus última semana" data-tab-panel="resumen">
+      <section class="panel wide benchmark-panel" aria-label="Referencia versus ultima semana" data-tab-panel="resumen">
         <div class="panel-head">
           <div>
             <p>Referencia operacional</p>
-            <h2>Referencia versus última semana</h2>
+            <h2>Referencia versus ultima semana</h2>
           </div>
           <span class="table-count" id="benchmarkWeek">Calculando semana</span>
         </div>
         <div class="benchmark-head">
           <strong>Referencia</strong>
-          <strong>Última Semana</strong>
+          <strong>Ultima Semana</strong>
         </div>
         <div class="benchmark-grid" id="benchmarkRows"></div>
       </section>
@@ -90,7 +91,39 @@
         <div class="occupancy-info-grid" id="occupancyInfo"></div>
       </section>
 
-      <section class="layout" id="contenidoDashboard">
+      <section class="command-center" id="contenidoDashboard" data-tab-panel="resumen">
+        <article class="panel executive">
+          <div class="panel-head">
+            <div>
+              <p>Lectura rapida</p>
+              <h2>Que necesita atencion hoy</h2>
+            </div>
+            <button id="toggleCauseBreakdown" class="icon-action" type="button" aria-expanded="false">Desglose</button>
+          </div>
+          <div class="status-callout" id="statusCallout">
+            <span></span>
+            <div>
+              <strong id="statusTitle">Cargando datos</strong>
+              <small id="statusText">La lectura se genera desde el Excel.</small>
+            </div>
+          </div>
+          <div class="insight-list" id="insightList"></div>
+          <div class="breakdown-panel" id="causeBreakdown" hidden></div>
+          <div class="action-list" id="actionList"></div>
+        </article>
+
+        <article class="panel ops-panel">
+          <div class="panel-head">
+            <div>
+              <p>Nodos criticos</p>
+              <h2>Motivos operacionales por cantidad</h2>
+            </div>
+          </div>
+          <div class="ops-grid" id="operationalMotives"></div>
+        </article>
+      </section>
+
+      <section class="layout">
         <article class="panel wide weekly-panel" data-tab-panel="semana" hidden>
           <div class="panel-head">
             <div>
@@ -98,19 +131,10 @@
             </div>
           </div>
           <section class="kpi-grid kpi-grid-inline" aria-label="Indicadores del periodo semanal">
-            <article class="kpi blue kpi-production">
+            <article class="kpi blue">
               <img class="kpi-visual" src="./assets/kpi-pabellon.svg" alt="" aria-hidden="true" />
-              <span>Producción semanal</span>
-              <div class="kpi-metric-pair">
-                <div>
-                  <small>Programados</small>
-                  <strong id="weekKpiTotal">0</strong>
-                </div>
-                <div>
-                  <small>Realizados</small>
-                  <strong id="weekKpiTotalDone">0</strong>
-                </div>
-              </div>
+              <span>Producción semanal total</span>
+              <strong id="weekKpiTotal">0</strong>
               <small id="weekKpiTotalText">Casos del periodo seleccionado</small>
             </article>
             <article class="kpi green">
@@ -148,48 +172,29 @@
           <div class="weekly-grid" id="weeklySummary"></div>
           <div class="section-subhead">
             <div>
-              <p>Análisis semanal</p>
-              <h3>Causas de suspensión y motivos de atraso</h3>
+              <p>Analisis semanal</p>
+              <h3>Causas de suspension y motivos de atraso</h3>
             </div>
             <span>Vista por cantidad</span>
           </div>
           <div class="weekly-reason-grid" id="weeklyReasonBars"></div>
         </article>
 
-        <article class="panel executive" data-tab-panel="resumen">
+        <article class="panel wide daily-focus" data-tab-panel="pabellones" hidden>
           <div class="panel-head">
             <div>
-              <p>Lectura rápida</p>
-              <h2>Estado de producción</h2>
+              <p>Produccion diaria</p>
+              <h2>Pabellon por dia con justificacion</h2>
             </div>
-            <button id="toggleCauseBreakdown" class="icon-action" type="button" aria-expanded="false">Desglose</button>
+            <span class="table-count" id="dailyRoomCount">0 registros</span>
           </div>
-          <div class="status-callout" id="statusCallout">
-            <span></span>
-            <div>
-              <strong id="statusTitle">Cargando datos</strong>
-              <small id="statusText">La lectura se genera desde el Excel.</small>
-            </div>
-          </div>
-          <div class="insight-list" id="insightList"></div>
-          <div class="breakdown-panel" id="causeBreakdown" hidden></div>
-          <div class="action-list" id="actionList"></div>
-        </article>
-
-        <article class="panel wide ops-panel" data-tab-panel="resumen">
-          <div class="panel-head">
-            <div>
-              <p>Nodos críticos</p>
-              <h2>Motivos operacionales por cantidad</h2>
-            </div>
-          </div>
-          <div class="ops-grid" id="operationalMotives"></div>
+          <div class="daily-room-grid" id="dailyRoomProduction"></div>
         </article>
 
         <article class="panel" data-tab-panel="analisis" hidden>
           <div class="panel-head">
             <div>
-              <p>Categoría</p>
+              <p>Categoria</p>
               <h2>Mayor, menor y procedimiento</h2>
             </div>
           </div>
@@ -201,7 +206,7 @@
           <div class="panel-head">
             <div>
               <p>Especialidad</p>
-              <h2>Participación por servicio</h2>
+              <h2>Participacion por servicio</h2>
             </div>
           </div>
           <canvas id="specialtyChart" width="380" height="280"></canvas>
@@ -211,7 +216,7 @@
         <article class="panel wide delay-justification-panel" data-tab-panel="pabellones" hidden>
           <div class="panel-head">
             <div>
-              <p>Visión global de atrasos</p>
+              <p>Vision global de atrasos</p>
               <h2>Motivos justificados de atraso y recambio</h2>
             </div>
           </div>
@@ -229,22 +234,11 @@
           <div class="room-ranking" id="roomRanking"></div>
         </article>
 
-        <article class="panel wide" data-tab-panel="pabellones" hidden>
-          <div class="panel-head">
-            <div>
-              <p>Producción diaria</p>
-              <h2>Pabellón por día con justificación</h2>
-            </div>
-            <span class="table-count" id="dailyRoomCount">0 registros</span>
-          </div>
-          <div class="daily-room-grid" id="dailyRoomProduction"></div>
-        </article>
-
         <article class="panel" data-tab-panel="analisis" hidden>
           <div class="panel-head">
             <div>
               <p>Recambio</p>
-              <h2>Promedio entre cirugías</h2>
+              <h2>Promedio entre cirugias</h2>
             </div>
           </div>
           <div class="bar-list" id="turnoverBars"></div>
@@ -264,7 +258,7 @@
           <div class="panel-head">
             <div>
               <p>Tendencia</p>
-              <h2>Evolución diaria</h2>
+              <h2>Evolucion diaria</h2>
             </div>
           </div>
           <canvas id="trendChart" width="420" height="260"></canvas>
@@ -278,14 +272,14 @@
         <article class="panel wide soft-panel" data-tab-panel="analisis" hidden>
           <div class="panel-head">
             <div>
-              <p>CMA y hospitalización</p>
+              <p>CMA y hospitalizacion</p>
               <h2>Destino postoperatorio registrado</h2>
             </div>
           </div>
           <div class="flow-grid" id="cmaFlow"></div>
         </article>
 
-        <article class="panel wide" data-tab-panel="detalle" hidden>
+        <article class="panel wide detail-panel" data-tab-panel="detalle" hidden>
           <div class="panel-head">
             <div>
               <p>Detalle ejecutivo</p>
@@ -297,17 +291,17 @@
             <table>
               <thead>
                 <tr>
-                  <th>Día</th>
+                  <th>Dia</th>
                   <th>Paciente</th>
-                  <th>Pabellón</th>
+                  <th>Pabellon</th>
                   <th>Estado</th>
                   <th>Ingreso</th>
-                  <th>Clasificación</th>
+                  <th>Clasificacion</th>
                   <th>Asertividad</th>
                   <th>Recambio</th>
                   <th>Especialidad</th>
                   <th>Subespecialidad</th>
-                  <th>Cirugía / causa</th>
+                  <th>Cirugia / causa</th>
                 </tr>
               </thead>
               <tbody id="attentionRows"></tbody>
@@ -318,6 +312,6 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="./dashboard.js?v=20260612-github-excel-1"></script>
+    <script src="./dashboard-v2.js?v=20260612-analisis-barras-pabellon-1"></script>
   </body>
 </html>
