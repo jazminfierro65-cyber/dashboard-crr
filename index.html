@@ -3,198 +3,361 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cirugías electivas</title>
+    <title>Produccion pabellones quirurgicos CRR</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <aside class="sidebar" aria-label="Navegacion principal">
       <div class="brand">
-        <img class="hospital-logo" src="../assets/felix-bulnes-logo.png" alt="Hospital Clinico Felix Bulnes" />
+        <img class="hospital-logo" src="./assets/felix-bulnes-logo.png" alt="Hospital Clínico Félix Bulnes" />
         <div>
-          <strong>Cirugías electivas</strong>
-          <span>Gestión de tabla quirúrgica</span>
+          <strong>CRR Pabellones</strong>
+          <span>Hospital Clínico Félix Bulnes</span>
         </div>
       </div>
       <nav>
-        <a class="active" href="#resumen">Resumen</a>
-        <a href="#lista">Lista quirúrgica</a>
-        <a href="#tabla">Tabla semanal</a>
-        <a href="#registro">Nuevo caso</a>
+        <a href="#resumen" class="active">Resumen</a>
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./seguimiento.html">Seguimiento diario</a>
+        <a href="#pabellones">Pabellones</a>
+        <a href="#quirofano">Análisis Excel</a>
+        <a href="#eventos">Eventos</a>
+        <a href="#mejora">Mejora</a>
       </nav>
-      <section class="side-note">
-        <span class="status-light"></span>
-        <p>Tablero separado del proyecto CRR. Los cambios quedan guardados en este navegador.</p>
-      </section>
+      <div class="status-panel">
+        <span class="dot"></span>
+        <p>Semana 21 cargada desde informe CRR. Los nuevos registros quedan guardados en este navegador.</p>
+      </div>
     </aside>
 
     <main class="app-shell">
       <header class="topbar">
         <div>
-          <p class="eyebrow">Planificación electiva</p>
-          <h1>Seguimiento de cirugías electivas</h1>
-          <p class="lead">Prioriza pacientes, confirma preparación preoperatoria y detecta riesgo de suspensión antes del día de pabellón.</p>
+          <p class="eyebrow">Funcionamiento pabellones CRR</p>
+          <h1>Produccion pabellones quirurgicos CRR</h1>
+          <p class="lead">Visualiza rápidamente si la jornada está fluyendo, dónde se concentran las demoras y qué pabellones requieren intervención de jefatura.</p>
         </div>
-        <div class="filters" aria-label="Filtros del tablero">
+        <div class="date-controls" aria-label="Filtros del tablero">
           <label>
-            Semana
-            <select id="weekFilter"></select>
+            Filtrar fecha
+            <select id="dateFilter"></select>
           </label>
           <label>
-            Especialidad
-            <select id="specialtyFilter"></select>
+            Filtrar nodo
+            <select id="nodeFilter">
+              <option value="todos">Todos</option>
+            </select>
           </label>
           <label>
-            Estado
-            <select id="statusFilter"></select>
+            Filtrar evento
+            <select id="eventTypeFilter">
+              <option value="todos">Todos</option>
+              <option value="Suspensión">Suspensiones</option>
+              <option value="Demora ingreso >15">Retraso primera hora</option>
+              <option value="Recambio >15">Recambio >15</option>
+              <option value="Nodo crítico">Nodo crítico</option>
+            </select>
           </label>
-          <button id="resetData" type="button">Restaurar</button>
+          <button id="resetData" type="button">Restaurar datos</button>
         </div>
       </header>
 
-      <section id="resumen" class="kpi-grid" aria-label="Indicadores principales">
-        <article class="metric">
-          <span>Programadas</span>
-          <strong id="kpiScheduled">0</strong>
-          <small>Casos electivos en la vista</small>
-        </article>
-        <article class="metric ok">
-          <span>Confirmadas</span>
-          <strong id="kpiConfirmed">0%</strong>
-          <small id="confirmedDetail">0 pacientes listos</small>
-        </article>
-        <article class="metric warning">
-          <span>Riesgo suspensión</span>
-          <strong id="kpiRisk">0</strong>
-          <small>Preoperatorio, cama o pabellón pendiente</small>
-        </article>
-        <article class="metric">
-          <span>Espera promedio</span>
-          <strong id="kpiWait">0 días</strong>
-          <small>Desde indicación quirúrgica</small>
-        </article>
-      </section>
-
       <section class="decision-strip" aria-label="Lectura ejecutiva">
-        <article class="decision-card">
-          <span>Prioridad del día</span>
-          <strong id="priorityTitle">Sin datos</strong>
-          <small id="priorityDetail">Seleccione filtros para calcular foco operativo.</small>
+        <article class="status-card" id="operationalStatus">
+          <span class="status-dot"></span>
+          <div>
+            <p>Estado operativo</p>
+            <strong id="statusTitle">Sin datos</strong>
+            <small id="statusDetail">Actualice los filtros para ver la lectura del día.</small>
+          </div>
         </article>
         <article class="decision-card">
-          <span>Cuello de botella</span>
-          <strong id="bottleneckTitle">Sin datos</strong>
-          <small id="bottleneckDetail">Se calcula por pendientes repetidos.</small>
+          <span>Prioridad jefatura</span>
+          <strong id="priorityFocus">Revisar nodos críticos</strong>
+          <small id="priorityDetail">Se calcula con demoras, suspensiones y frecuencia de nodos.</small>
         </article>
         <article class="decision-card">
           <span>Acción sugerida</span>
-          <strong id="suggestedAction">Confirmar llamados</strong>
-          <small>Dejar responsable antes de cerrar la jornada.</small>
+          <strong id="suggestedAction">Registrar causa y responsable</strong>
+          <small>El tablero debe cerrar cada alerta con un dueño operativo.</small>
+        </article>
+      </section>
+
+      <section id="resumen" class="kpi-grid" aria-label="Indicadores principales">
+        <article class="metric">
+          <span>Programados</span>
+          <strong id="kpiProgramados">0</strong>
+          <small>Pacientes planificados en la jornada</small>
+        </article>
+        <article class="metric">
+          <span>Operados</span>
+          <strong id="kpiOperados">0</strong>
+          <small>Pacientes efectivamente resueltos</small>
+        </article>
+        <article class="metric alert">
+          <span>Suspensiones</span>
+          <strong id="kpiSuspensiones">0%</strong>
+          <small id="kpiSuspensionesDetail">0 casos</small>
+        </article>
+        <article class="metric warning">
+          <span>Demora primera hora</span>
+          <strong id="kpiDemora">0 min</strong>
+          <small>Meta menor a 15 min</small>
         </article>
       </section>
 
       <section class="content-grid">
-        <article class="panel wide" id="lista">
+        <article class="panel wide" id="pabellones">
           <div class="panel-header">
-            <div>
-              <p class="eyebrow">Lista quirúrgica</p>
-              <h2>Pacientes electivos priorizados</h2>
+          <div>
+            <p class="eyebrow">Vista diaria</p>
+              <h2>Lectura simple de la jornada</h2>
             </div>
-            <span id="caseCount" class="pill">0 casos</span>
+            <span id="selectedDayLabel" class="pill"></span>
           </div>
-          <div class="case-list" id="caseList"></div>
+          <div class="or-list" id="dailyList"></div>
         </article>
 
         <article class="panel">
           <div class="panel-header">
             <div>
-              <p class="eyebrow">Preparación</p>
-              <h2>Pendientes preoperatorios</h2>
+              <p class="eyebrow">Nodos</p>
+              <h2>Dónde se atasca el proceso</h2>
             </div>
           </div>
-          <div class="bar-list" id="pendingBars"></div>
+          <div class="node-map" id="nodeMap"></div>
         </article>
 
         <article class="panel">
           <div class="panel-header">
             <div>
-              <p class="eyebrow">Distribución</p>
-              <h2>Casos por especialidad</h2>
+              <p class="eyebrow">Tendencia</p>
+              <h2>Ingreso tardío a pabellón</h2>
             </div>
           </div>
-          <canvas id="specialtyChart" width="540" height="300" aria-label="Grafico de cirugias por especialidad"></canvas>
+          <canvas id="delayChart" width="560" height="300" aria-label="Grafico de demoras por dia"></canvas>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Suspensiones</p>
+              <h2>Por qué se suspenden cirugías</h2>
+            </div>
+          </div>
+          <div class="bar-list" id="suspensionBars"></div>
         </article>
       </section>
 
-      <section id="tabla" class="panel full">
+      <section id="quirofano" class="panel full">
         <div class="panel-header">
           <div>
-            <p class="eyebrow">Tabla semanal</p>
-            <h2>Agenda por pabellón</h2>
+            <p class="eyebrow">Excel incorporado</p>
+            <h2>Análisis de quirófano</h2>
+          </div>
+          <div class="surgery-tools">
+            <label>
+              Día
+              <select id="surgeryDateFilter"></select>
+            </label>
+            <label>
+              Especialidad
+              <select id="surgerySpecialtyFilter"></select>
+            </label>
+            <label>
+              Estado
+              <select id="surgeryStatusFilter"></select>
+            </label>
+            <label>
+              Categoría
+              <select id="surgeryCategoryFilter"></select>
+            </label>
+            <button id="refreshExcelData" type="button">Actualizar desde Excel</button>
           </div>
         </div>
-        <div class="schedule-grid" id="scheduleGrid"></div>
+
+        <div class="mini-kpis" aria-label="Resumen quirófano">
+          <div><span>Registros</span><strong id="surgeryTotal">0</strong></div>
+          <div><span>Demora >15</span><strong id="surgeryDelayed">0</strong></div>
+          <div><span>Duración real prom.</span><strong id="surgeryAvgDuration">0 min</strong></div>
+          <div><span>Subestimación</span><strong id="surgeryUnder">0</strong></div>
+        </div>
+
+        <div class="table-help">
+          Complete manualmente <strong>Tiempo programado de cirugía en tabla (Min)</strong>. La web compara ese tiempo contra la duración real y clasifica la asertividad para cada pabellón.
+        </div>
+
+        <div class="leadership-grid" aria-label="Resumen para jefaturas">
+          <article>
+            <span>Mayor riesgo</span>
+            <strong id="leadRisk">Sin datos</strong>
+            <small id="leadRiskDetail">Se actualiza con filtros y tiempos programados.</small>
+          </article>
+          <article>
+            <span>Pabellón a revisar</span>
+            <strong id="leadRoom">Sin datos</strong>
+            <small id="leadRoomDetail">Prioriza subestimaciones y suspensiones.</small>
+          </article>
+          <article>
+            <span>Dato pendiente</span>
+            <strong id="leadPending">0</strong>
+            <small>Cirugías sin tiempo programado ingresado.</small>
+          </article>
+        </div>
+
+        <div class="chart-grid" aria-label="Gráficos de distribución quirúrgica">
+          <article class="chart-card">
+            <div class="panel-header compact">
+              <div>
+                <p class="eyebrow">Categoría</p>
+                <h2>Mayores, menores y procedimientos</h2>
+              </div>
+            </div>
+            <canvas id="categoryDonut" width="360" height="300" aria-label="Grafico circular de categorias quirurgicas"></canvas>
+            <div class="chart-legend" id="categoryLegend"></div>
+          </article>
+          <article class="chart-card">
+            <div class="panel-header compact">
+              <div>
+                <p class="eyebrow">Especialidad</p>
+                <h2>Distribución por especialidad</h2>
+              </div>
+            </div>
+            <canvas id="specialtyDonut" width="360" height="300" aria-label="Grafico circular por especialidad"></canvas>
+            <div class="chart-legend" id="specialtyLegend"></div>
+          </article>
+        </div>
+
+        <div class="room-summary">
+          <div class="panel-header compact">
+            <div>
+              <p class="eyebrow">Por día y pabellón</p>
+              <h2>Asertividad, suspensiones y causas</h2>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="room-summary-table">
+              <thead>
+                <tr>
+                  <th>Día</th>
+                  <th>Pabellón</th>
+                  <th>Cirugías</th>
+                  <th>Asertivo</th>
+                  <th>Subestimación</th>
+                  <th>Sobrestimación</th>
+                  <th>Pendiente</th>
+                  <th>Suspensiones</th>
+                  <th>Causas / cirugías suspendidas</th>
+                </tr>
+              </thead>
+              <tbody id="roomSummaryRows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="table-wrap surgery-table-wrap">
+          <div class="table-caption">Detalle paciente a paciente. Úselo para auditoría o revisión clínica-operativa específica.</div>
+          <table class="surgery-table">
+            <thead>
+              <tr>
+                <th>Paciente</th>
+                <th>Edad</th>
+                <th>Descripción cirugía</th>
+                <th>Codigo 1</th>
+                <th>Codigo 2</th>
+                <th>Categoria</th>
+                <th>Especialidad</th>
+                <th>Anestesista</th>
+                <th>Cirujano</th>
+                <th>Ingreso</th>
+                <th>Inicio</th>
+                <th>Término</th>
+                <th>Salida</th>
+                <th>Duración real</th>
+                <th>Tiempo programado</th>
+                <th>Diferencia</th>
+                <th>Asertividad</th>
+              </tr>
+            </thead>
+            <tbody id="surgeryRows"></tbody>
+          </table>
+        </div>
       </section>
 
-      <section id="registro" class="panel full">
+      <section id="eventos" class="panel full">
         <div class="panel-header">
           <div>
-            <p class="eyebrow">Registro manual</p>
-            <h2>Agregar cirugía electiva</h2>
+            <p class="eyebrow">Registro diario</p>
+            <h2>Registrar evento operativo</h2>
           </div>
         </div>
-        <form id="caseForm" class="case-form">
-          <label>
-            Fecha pabellón
-            <input name="date" type="date" required />
-          </label>
-          <label>
-            Paciente
-            <input name="patient" type="text" placeholder="Iniciales o identificador interno" required />
-          </label>
-          <label>
-            Especialidad
-            <select name="specialty" required>
-              <option>Traumatología</option>
-              <option>Cirugía adulto</option>
-              <option>Ginecología</option>
-              <option>Urología</option>
-              <option>Otorrino</option>
-              <option>Oftalmología</option>
+        <form id="eventForm" class="event-form">
+          <label>Fecha <input name="date" type="date" required /></label>
+          <label>Tipo
+            <select name="type" required>
+              <option>Demora ingreso >15</option>
+              <option>Suspensión</option>
+              <option>Recambio >15</option>
+              <option>Nodo crítico</option>
             </select>
           </label>
-          <label>
-            Pabellón
-            <select name="room" required>
-              <option>Pab 1</option>
-              <option>Pab 2</option>
-              <option>Pab 3</option>
-              <option>Pab 4</option>
-              <option>Pab CMA</option>
-            </select>
+          <label>Especialidad <input name="specialty" placeholder="Ej. Oftalmología" required /></label>
+          <label>Pabellón <input name="room" placeholder="Ej. Pab 2" required /></label>
+          <label>Minutos <input name="minutes" type="number" min="0" step="1" value="0" /></label>
+          <label>Cantidad <input name="count" type="number" min="1" step="1" value="1" required /></label>
+          <label>Nodo
+            <select name="node" required></select>
           </label>
-          <label>
-            Estado
-            <select name="status" required>
-              <option>Confirmada</option>
-              <option>Preoperatorio pendiente</option>
-              <option>Cama pendiente</option>
-              <option>Paciente no contactado</option>
-              <option>Riesgo de suspensión</option>
-            </select>
-          </label>
-          <label>
-            Espera desde indicación
-            <input name="waitDays" type="number" min="0" step="1" value="30" required />
-          </label>
-          <label class="span-2">
-            Observación
-            <input name="note" type="text" placeholder="Ej: exámenes vigentes, consentimiento, insumos, cama" />
-          </label>
-          <button type="submit">Agregar caso</button>
+          <label class="span-2">Causa / observación <input name="cause" placeholder="Motivo accionable" required /></label>
+          <button type="submit">Agregar registro</button>
         </form>
+      </section>
+
+      <section class="panel full">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Bitácora</p>
+            <h2>Eventos registrados</h2>
+          </div>
+          <button id="exportCsv" type="button">Exportar CSV</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Especialidad</th>
+                <th>Pabellón</th>
+                <th>Nodo</th>
+                <th>Min</th>
+                <th>Cant.</th>
+                <th>Causa / observación</th>
+              </tr>
+            </thead>
+            <tbody id="eventRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="mejora" class="panel full">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Mejoramiento</p>
+            <h2>Rutina recomendada para jefaturas</h2>
+          </div>
+        </div>
+        <div class="workflow">
+          <div><strong>1</strong><span>Antes de iniciar: confirmar tabla, camas, instrumental y equipos quirúrgicos.</span></div>
+          <div><strong>2</strong><span>Durante la jornada: registrar toda demora mayor a 15 min con causa y nodo.</span></div>
+          <div><strong>3</strong><span>Cierre diario: revisar pabellones con subestimación, suspensión o datos pendientes.</span></div>
+          <div><strong>4</strong><span>Reunión semanal: convertir el principal nodo crítico en una acción con responsable.</span></div>
+        </div>
       </section>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="./surgery-data.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>
